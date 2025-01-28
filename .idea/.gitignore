@@ -1,0 +1,11 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+/out.r1cs
+/out
+/abi.json
+/proving.key
+/verification.key
+/out.wtns
+/witness
+/proof.json
