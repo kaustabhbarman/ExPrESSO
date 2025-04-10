@@ -5,9 +5,9 @@ from expresso.idp.idp import IdentityProvider
 from expresso.rp.utils import hash_for_zokrates_cli
 
 def generate_secret():
-    preimage = int.to_bytes(1234567, 64, "big")
+    raw_secret = int.to_bytes(1234567, 64, "big")
 
-    secret = hashlib.sha256(preimage).digest()
+    secret = hashlib.sha256(raw_secret).digest()
     secret += secret
 
     digest = hashlib.sha256(secret).digest()
@@ -22,16 +22,16 @@ class RelyingParty():
         self.idp = idp
 
     def compute_witness(self):
-        preimage, digest = generate_secret()
+        secret, digest = generate_secret()
 
         sig_R, sig_S = self.idp.request_token(digest)
         pk = self.idp.public_key
 
-        hash_preimage = hash_for_zokrates_cli(preimage)
-        hash_digest = hash_for_zokrates_cli(digest)
+        secret_cli = hash_for_zokrates_cli(secret)
+        digest_cli = hash_for_zokrates_cli(digest)
         signature_args = f"{sig_R.x} {sig_R.y} {sig_S} {pk.p.x.n} {pk.p.y.n}"
 
-        witness_args = (hash_preimage + " " + signature_args + " " + hash_digest).split()
+        witness_args = (secret_cli + " " + signature_args + " " + digest_cli).split()
 
         subprocess.run([
             "zokrates", "compute-witness",
