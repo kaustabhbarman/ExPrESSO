@@ -4,25 +4,22 @@ import subprocess
 from expresso.idp.idp import IdentityProvider
 from expresso.rp.utils import hash_for_zokrates_cli
 
-
 def generate_secret():
-    uid = int.to_bytes(1234567, 64, "big")
+    preimage = int.to_bytes(1234567, 64, "big")
 
-    raw = hashlib.sha256(uid).digest()
-    raw += raw
+    secret = hashlib.sha256(preimage).digest()
+    secret += secret
 
-    digest = hashlib.sha256(raw).digest()
+    digest = hashlib.sha256(secret).digest()
     digest += digest
 
-    return raw, digest
+    return digest, digest
 
 
 class RelyingParty():
 
     def __init__(self, idp: IdentityProvider):
         self.idp = idp
-        self.token = None
-        self.secret = None
 
     def compute_witness(self):
         preimage, digest = generate_secret()
@@ -45,12 +42,14 @@ class RelyingParty():
         ])
 
     def generate_proof(self):
-        proofPath = "expresso/rp/.artifacts/proof.json"
+        proof = "expresso/rp/.artifacts/proof.json"
+
         subprocess.run([
             "zokrates", "generate-proof",
             "-i", "expresso/oidf/.artifacts/out",
             "-p", "expresso/oidf/.artifacts/proving.key",
-            "-j", proofPath,
+            "-j", proof,
             "-w", "expresso/rp/.artifacts/witness",
         ])
-        return proofPath
+
+        return proof
