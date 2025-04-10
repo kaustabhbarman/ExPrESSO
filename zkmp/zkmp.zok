@@ -1,9 +1,0 @@
-import "hashes/poseidon/poseidon" as poseidon;
-
-def main(private field x, private u32 index, field commitment) -> bool {
-    // Compute the witness inside Alice’s proof
-    field witness = poseidon([x, index]);
-
-    // Verify against the public commitment
-    return poseidon([witness]) == commitment;
-}
